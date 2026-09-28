@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Tes berjalan</title>
+<style>
+  body { font: 14px/1.6 ui-monospace, monospace; padding: 16px; background: #0b1220; color: #e6edf7; }
+  .ok { color: #34d399; } .bad { color: #ff8a3d; }
+</style>
+</head>
+<body>
+<h1>AJAIB TOOLS: tes</h1>
+<pre id="out"></pre>
+<script>
+const TESTS = [];
+const test = (name, fn) => TESTS.push([name, fn]);
+const assert = (ok, msg) => { if (!ok) throw new Error(msg || 'assert gagal'); };
+const near = (a, b, tol, msg) => assert(Math.abs(a - b) <= tol, `${msg || 'nilai'}: ${a} bukan ${b} ±${tol}`);
+async function throwsMsg(fn, re) {
+  try { await fn(); } catch (e) { assert(re.test(e.message), `pesan "${e.message}" tidak cocok dengan ${re}`); return; }
+  throw new Error('seharusnya melempar error');
+}
+window.addEventListener('load', async () => {
+  const out = document.getElementById('out');
+  let fail = 0;
+  for (const [name, fn] of TESTS) {
+    const line = document.createElement('span');
+    try { await fn(); line.className = 'ok'; line.textContent = `✔ ${name}\n`; }
+    catch (e) { fail++; line.className = 'bad'; line.textContent = `✘ ${name}: ${e.message}\n`; }
+    out.append(line);
+  }
+  document.title = fail ? `FAIL ${fail}/${TESTS.length}` : `PASS ${TESTS.length}`;
+});
+test('harness jalan', () => assert(typeof JSZip === 'function', 'JSZip tidak termuat'));
+</script>
+<script src="../vendor/jszip.min.js"></script>
+<script src="../js/kml.js"></script>
+<script src="../js/sor.js"></script>
+<script src="fixture.js"></script>
+<script src="kml.test.js"></script>
+<script src="sor.test.js"></script>
+<script src="../js/report.js"></script>
+<script src="report.test.js"></script>
+<script src="../js/chart.js"></script>
+<script>
+// Smoke test: file UI tidak boleh kembali menjadi stub (pernah terjadi lewat commit yang tercampur).
+test('UI: chart.js dan halaman UI bukan stub', async () => {
+  assert(typeof TraceChart.draw === 'function' && typeof TraceChart.fullView === 'function', 'TraceChart tidak lengkap');
+  for (const f of ['app.js', 'boq-ui.js', 'sor-ui.js', 'pdf-ui.js']) {
+    const src = await (await fetch('../js/' + f)).text();
+    assert(src.length > 1000 && (f === 'app.js' || src.includes('mount(')), `${f} tampak seperti stub (${src.length} byte)`);
+  }
+});
+</script>
+<h2>Uji file SOR asli</h2>
+<p>Pilih satu atau beberapa file SOR. Setiap file dibaca, ditulis ulang, lalu dibaca lagi.</p>
+<input type="file" id="real" accept=".sor" multiple>
+<pre id="real-out"></pre>
+<script>
+document.getElementById('real').onchange = async (e) => {
+  const out = document.getElementById('real-out');
+  out.textContent = '';
+  const dp = (x) => { const b = x.blocks.find((b) => b.name === 'DataPts'); return x.bytes.subarray(b.offset, b.offset + b.size).join(','); };
+  const evs = (x) => JSON.stringify(x.events.map((e) => [e.time, e.loss, e.refl, e.code, e.comment]));
+  for (const f of e.target.files) {
+    try {
+      const bytes = new Uint8Array(await f.arrayBuffer()), s = SOR.parse(bytes, f.name);
+      let line = `${f.name}: v${s.version}, ${s.sup?.supplier || '?'} ${s.sup?.model || ''}, ${s.events.length} event, ${(s.trace.length * s.dx).toFixed(0)} m, checksum asli ${s.checksumOk ? 'OK' : 'SALAH'}`;
+      if (s.version === 2) {
+        s.dirty.add('GenParams'); s.dirty.add('KeyEvents');
+        const w = SOR.write(s), t = SOR.parse(w, f.name);
+        line += `, tulis ulang: checksum ${t.checksumOk ? 'OK' : 'SALAH'}, event sama ${evs(s) === evs(t)}, DataPts sama ${dp(s) === dp(t)}, byte identik ${w.join(',') === bytes.join(',')}`;
+      }
+      out.textContent += line + '\n';
+    } catch (err) { out.textContent += `${f.name}: ERROR ${err.message}\n`; }
+  }
+};
+</script>
+</body>
+</html>

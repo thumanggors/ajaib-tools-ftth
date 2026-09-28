@@ -1,0 +1,4 @@
+jszip 3.10.1 (cdnjs)
+jspdf 3.0.4 (jsdelivr)
+@fontsource-variable/space-grotesk 5 latin wght (OFL)
+@fontsource-variable/jetbrains-mono 5 latin wght (OFL)

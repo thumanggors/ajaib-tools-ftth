@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="id" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AJAIB TOOLS</title>
+<meta name="description" content="Tools proyek fiber optik OSP/FTTH: KML/KMZ ke BOQ, editor SOR OTDR, dan SOR ke PDF.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23060a13'/%3E%3Cpath d='M4 16h8l3-7 4 14 3-7h6' fill='none' stroke='%2322d3ee' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/app.css">
+<script>try { document.documentElement.dataset.theme = JSON.parse(localStorage.getItem('aj.theme')) || 'dark'; } catch (e) {}</script>
+</head>
+<body>
+<a class="skip" href="#view">Lewati ke konten</a>
+<div class="shell">
+  <nav class="nav" aria-label="Navigasi utama">
+    <a class="brand" href="#/">
+      <svg class="logo" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/><path d="M4 16h8l3-7 4 14 3-7h6" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>AJAIB<b>TOOLS</b></span>
+    </a>
+    <a href="#/" data-route=""><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3z"/></svg><span>Beranda</span></a>
+    <a href="#/boq" data-route="boq"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h8.5a3.5 3.5 0 0 0 0-7h-9a3.5 3.5 0 0 1 0-7H16"/></svg><span>KML ke BOQ</span></a>
+    <a href="#/sor" data-route="sor"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg><span>Editor SOR</span></a>
+    <a href="#/pdf" data-route="pdf"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg><span>SOR ke PDF</span></a>
+    <button class="icon-btn theme" id="theme" type="button" aria-label="Ganti tema terang/gelap"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></svg><span>Tema</span></button>
+  </nav>
+  <main id="view" tabindex="-1"></main>
+</div>
+<div id="toasts" role="status" aria-live="polite"></div>
+
+<template id="tpl-home">
+  <section class="hero">
+    <svg class="fiber" viewBox="0 0 800 220" preserveAspectRatio="none" aria-hidden="true">
+      <path class="core" d="M-10 170 C 140 170 210 70 370 70 S 610 180 810 100"/>
+      <path class="light" d="M-10 170 C 140 170 210 70 370 70 S 610 180 810 100"/>
+      <path class="light b" d="M-10 170 C 140 170 210 70 370 70 S 610 180 810 100"/>
+    </svg>
+    <p class="eyebrow">Toolkit proyek OSP &amp; FTTH</p>
+    <h1>AJAIB <span>TOOLS</span></h1>
+    <p class="lead">Hitung BOQ dari desain KMZ, rapikan hasil ukur OTDR, lalu cetak laporannya. Semua file diproses di browser Anda dan tidak dikirim ke server mana pun.</p>
+  </section>
+  <div class="cards">
+    <a class="card" href="#/boq" style="--i:0">
+      <span class="ico"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h8.5a3.5 3.5 0 0 0 0-7h-9a3.5 3.5 0 0 1 0-7H16"/></svg></span>
+      <h2>KML/KMZ ke BOQ</h2>
+      <p>Jumlah tiang, ODP, dan panjang kabel dihitung per folder, lalu langsung jadi file Excel.</p>
+      <span class="go">Buka tool</span>
+    </a>
+    <a class="card" href="#/sor" style="--i:1">
+      <span class="ico"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span>
+      <h2>Editor SOR</h2>
+      <p>Analisis ulang event dari trace asli, edit header banyak file sekaligus, dan cek pass/fail.</p>
+      <span class="go">Buka tool</span>
+    </a>
+    <a class="card" href="#/pdf" style="--i:2">
+      <span class="ico"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg></span>
+      <h2>SOR ke PDF</h2>
+      <p>Laporan uji batch, satu halaman A4 per fiber, lengkap dengan kop proyek.</p>
+      <span class="go">Buka tool</span>
+    </a>
+  </div>
+</template>
+
+<template id="tpl-boq">
+  <header class="page-head"><h1>KML/KMZ ke BOQ</h1><p>Item diambil dari nama folder. Titik dan poligon dihitung per buah, garis dijumlah panjangnya dalam meter.</p></header>
+  <label class="drop" data-drop>
+    <input type="file" accept=".kml,.kmz" class="sr-only">
+    <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0-5 5m5-5 5 5M4 20h16"/></svg>
+    <strong>Jatuhkan file KML/KMZ di sini</strong><span>atau klik untuk memilih file</span>
+  </label>
+  <section class="result" hidden>
+    <div class="stats">
+      <div class="stat"><span class="num" data-k="items">0</span><span>item BOQ</span></div>
+      <div class="stat"><span class="num" data-k="pcs">0</span><span>total titik (pcs)</span></div>
+      <div class="stat"><span class="num" data-k="m">0</span><span>total panjang (m)</span></div>
+    </div>
+    <div class="table-wrap"><table class="boq"><thead><tr><th>No</th><th>Item</th><th>Satuan</th><th class="r">Volume</th></tr></thead><tbody></tbody></table></div>
+    <button class="btn primary" type="button" data-act="xlsx"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v12m0 0-5-5m5 5 5-5M4 20h16"/></svg>Download Excel</button>
+  </section>
+</template>
+
+<template id="tpl-sor">
+  <header class="page-head"><h1>Editor SOR</h1><p>Geser, tambah, atau hapus event langsung di grafik. Loss dan reflectance selalu dihitung ulang dari trace hasil ukur.</p></header>
+  <div class="sor-layout">
+    <aside class="ws" aria-label="Daftar file SOR">
+      <label class="drop small" data-drop>
+        <input type="file" accept=".sor" multiple class="sr-only">
+        <strong>Tambah file SOR</strong><span>jatuhkan atau klik</span>
+      </label>
+      <div class="ws-tools">
+        <label><input type="checkbox" data-act="all"> Pilih semua</label>
+        <button class="btn sm ghost" type="button" data-act="bulk">Edit massal</button>
+      </div>
+      <ul class="ws-list" data-list></ul>
+      <div class="ws-tools">
+        <button class="btn sm" type="button" data-act="save">Simpan SOR</button>
+        <button class="btn sm" type="button" data-act="saveall">Simpan semua (ZIP)</button>
+      </div>
+    </aside>
+    <section class="editor" data-editor hidden>
+      <div class="chart-bar">
+        <strong data-title></strong>
+        <span class="spacer"></span>
+        <button class="btn sm" type="button" data-act="add" disabled>Tambah event di kursor</button>
+        <button class="btn sm" type="button" data-act="del" disabled>Hapus event</button>
+        <button class="btn sm ghost" type="button" data-act="ab" aria-pressed="false">Marker A-B</button>
+        <button class="btn sm ghost" type="button" data-act="zin" aria-label="Perbesar grafik">+</button>
+        <button class="btn sm ghost" type="button" data-act="zout" aria-label="Perkecil grafik">&minus;</button>
+        <button class="btn sm ghost" type="button" data-act="reset">Reset zoom</button>
+      </div>
+      <article class="paper" aria-label="OTDR Report">
+        <h2 class="paper-title">OTDR Report</h2>
+        <div class="sec">Parameters</div>
+        <div class="kv" data-params></div>
+        <div class="sec">Summary</div>
+        <div class="kv" data-summ></div>
+        <div class="sec">Trace</div>
+        <div class="chart-box">
+          <canvas data-chart tabindex="0" role="img" aria-label="Grafik trace OTDR. Panah kiri/kanan untuk menggeser, plus/minus untuk zoom, Delete untuk menghapus event terpilih."></canvas>
+          <div class="ab-readout num" data-ab hidden></div>
+        </div>
+        <div class="sec">Event Table</div>
+        <div class="table-wrap"><table class="events"><thead><tr><th>№</th><th>Type</th><th>Distance, km</th><th>Loss, dB</th><th>Reflection, dB</th><th>Attenuation, dB/km</th><th>Komentar</th><th>Status</th></tr></thead><tbody data-events></tbody></table></div>
+      </article>
+      <p class="hint">Scroll untuk zoom, drag untuk menggeser. Klik trace untuk menaruh kursor. Drag garis event merah untuk memindahkannya.</p>
+      <details class="panel"><summary>Info header</summary><form class="form-grid" data-gen onsubmit="return false"></form></details>
+      <details class="panel"><summary>Ambang pass/fail</summary>
+        <form class="form-grid" data-thr onsubmit="return false">
+          <label>Splice maks (dB)<input type="number" step="0.01" name="splice"></label>
+          <label>Konektor maks (dB)<input type="number" step="0.01" name="connector"></label>
+          <label>Reflectance maks (dB)<input type="number" step="1" name="refl"></label>
+        </form>
+      </details>
+    </section>
+    <div class="empty" data-empty>Belum ada file. Tambahkan file SOR lewat panel di kiri.</div>
+  </div>
+  <dialog class="dlg" data-bulk aria-labelledby="bulk-title">
+    <form method="dialog">
+      <h2 id="bulk-title">Edit massal</h2>
+      <p>Isi field yang ingin diubah pada semua file yang dicentang. Field kosong tidak diubah. Tulis <code>{n}</code> untuk nomor urut, misalnya <code>F-{n}</code> menjadi F-1, F-2, dan seterusnya.</p>
+      <div class="form-grid" data-bulk-fields></div>
+      <menu><button class="btn ghost" value="cancel">Batal</button><button class="btn primary" value="ok">Terapkan</button></menu>
+    </form>
+  </dialog>
+</template>
+
+<template id="tpl-pdf">
+  <header class="page-head"><h1>SOR ke PDF</h1><p>Setiap file SOR menjadi satu halaman A4 berformat OTDR Report. File yang sudah dibuka di Editor SOR otomatis ikut dicetak.</p></header>
+  <div class="pdf-layout">
+    <form class="panel form-grid" data-kop onsubmit="return false">
+      <h2>Isian laporan</h2>
+      <label>Customer<input name="customer" autocomplete="organization"></label>
+      <label>Job Name<input name="job" autocomplete="off"></label>
+      <p class="meta">Tata letak mengikuti OTDR Report NOVKER. Font Segoe UI diambil dari Windows Anda; saat pertama membuat PDF browser meminta izin akses font.</p>
+    </form>
+    <div class="panel">
+      <label class="drop small" data-drop>
+        <input type="file" accept=".sor" multiple class="sr-only">
+        <strong>Tambah file SOR</strong><span>jatuhkan atau klik</span>
+      </label>
+      <p class="count"><span class="num" data-count>0</span>file siap dicetak</p>
+      <button class="btn primary" type="button" data-act="pdf" disabled>Buat PDF</button>
+      <div class="progress" hidden><div class="bar"></div><span data-prog aria-live="polite"></span></div>
+    </div>
+  </div>
+</template>
+
+<script src="vendor/jszip.min.js"></script>
+<script src="vendor/jspdf.umd.min.js"></script>
+<script src="js/kml.js"></script>
+<script src="js/sor.js"></script>
+<script src="js/report.js"></script>
+<script src="js/chart.js"></script>
+<script src="js/app.js"></script>
+<script src="js/boq-ui.js"></script>
+<script src="js/sor-ui.js"></script>
+<script src="js/pdf-ui.js"></script>
+</body>
+</html>
